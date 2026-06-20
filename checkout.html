@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>XyronVault Checkout</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="light-mode">
+
+  <nav class="navbar">
+    <a class="logo nav-brand" href="index.html">
+      <img class="nav-logo-img" src="logo.png" alt="XyronVault logo">
+      <span>XyronVault</span>
+    </a>
+
+    <div class="nav-center">
+      <a href="index.html#shop">Shop</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="index.html#support">Support</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+
+      <button class="cart-btn" onclick="window.location.href='index.html#shop'">
+        Continue Shopping
+      </button>
+    </div>
+  </nav>
+
+  <main class="checkout-page">
+    <section class="checkout-hero">
+      <div class="hero-trust-pill">
+        <span>🔒 Secure Checkout</span>
+      </div>
+
+      <h1 class="hero-title">
+        Complete Your <span>Order</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Fill in your delivery details and review your cart before placing the order.
+      </p>
+    </section>
+
+    <section class="checkout-layout">
+      <div class="checkout-form-card">
+        <h2>Delivery Details</h2>
+
+        <form id="checkoutForm">
+          <label>
+            Roblox Username
+            <input type="text" id="robloxUsername" placeholder="Enter your Roblox username" required>
+          </label>
+
+          <label>
+            Email or Discord
+            <input type="text" id="contactInfo" placeholder="Email or Discord username" required>
+          </label>
+
+          <label>
+            Delivery Notes
+            <textarea id="deliveryNotes" placeholder="Any special instructions?"></textarea>
+          </label>
+
+          <label>
+            Payment Method
+            <select id="paymentMethod" required>
+              <option value="">Select payment method</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Google Pay">Google Pay</option>
+              <option value="Crypto">Crypto</option>
+              <option value="Manual Payment">Manual Payment</option>
+            </select>
+          </label>
+
+          <button type="submit" class="place-order-btn" id="placeOrderBtn">
+            Place Order →
+          </button>
+        </form>
+      </div>
+
+      <div class="checkout-summary-card">
+        <h2>Order Summary</h2>
+
+        <div id="checkoutItems"></div>
+
+        <div class="checkout-total-row">
+          <span>Total</span>
+          <strong id="checkoutTotal">$0.00</strong>
+        </div>
+
+        <p class="checkout-note">
+          After placing your order, you’ll get an order ID. Your order will be saved in Firebase.
+        </p>
+      </div>
+    </section>
+
+    <section class="order-success" id="orderSuccess">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <h2>Order Placed!</h2>
+        <p>Your order has been saved successfully.</p>
+
+        <div class="order-id-box">
+          <span>Order ID</span>
+          <strong id="orderIdText">---</strong>
+        </div>
+
+        <button class="place-order-btn" onclick="copyOrderId()">
+          Copy Order ID
+        </button>
+
+        <button class="clear-btn" onclick="window.location.href='index.html'">
+          Back Home
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © 2026 XyronVault. All rights reserved.
+  </footer>
+
+  <script src="theme.js"></script>
+  <script type="module" src="firebase.js"></script>
+
+  <script>
+    const UPI_ID = "yourupiid@bank"; // put your real UPI ID here
+    const STORE_NAME = "XyronVault";
+
+    let cart = [];
+
+    try {
+      cart = JSON.parse(localStorage.getItem("cart")) || [];
+    } catch (error) {
+      cart = [];
+    }
+
+    const checkoutItems = document.getElementById("checkoutItems");
+    const checkoutTotal = document.getElementById("checkoutTotal");
+    const checkoutForm = document.getElementById("checkoutForm");
+    const orderSuccess = document.getElementById("orderSuccess");
+    const orderIdText = document.getElementById("orderIdText");
+    const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+    let latestOrderId = "";
+
+    function getCartTotal() {
+      let total = 0;
+
+      cart.forEach(function(item) {
+        total += Number(item.price || 0);
+      });
+
+      return total;
+    }
+
+    function makeUpiLink(orderId) {
+      const amount = getCartTotal();
+
+      return "upi://pay" +
+        "?pa=" + encodeURIComponent(UPI_ID) +
+        "&pn=" + encodeURIComponent(STORE_NAME) +
+        "&am=" + encodeURIComponent(amount.toFixed(2)) +
+        "&cu=INR" +
+        "&tn=" + encodeURIComponent("XyronVault Order " + orderId);
+    }
+
+    function renderCheckout() {
+      checkoutItems.innerHTML = "";
+
+      if (cart.length === 0) {
+        checkoutItems.innerHTML =
+          '<div class="empty-checkout">' +
+            '<h3>Your cart is empty ;-;</h3>' +
+            '<p>Add items before checking out.</p>' +
+            '<button onclick="window.location.href=\'index.html#shop\'">Go Shopping</button>' +
+          '</div>';
+
+        checkoutTotal.textContent = "$0.00";
+        checkoutForm.style.display = "none";
+        return;
+      }
+
+      checkoutForm.style.display = "block";
+
+      let total = 0;
+
+      cart.forEach(function(item) {
+        const price = Number(item.price || 0);
+        total += price;
+
+        const row = document.createElement("div");
+        row.className = "checkout-item";
+
+        let imageHTML = "<span>🎮</span>";
+
+        if (item.image) {
+          imageHTML = '<img src="' + item.image + '" alt="' + (item.name || "Item") + '">';
+        }
+
+        row.innerHTML =
+          '<div class="checkout-item-img">' +
+            imageHTML +
+          '</div>' +
+
+          '<div class="checkout-item-info">' +
+            '<h3>' + (item.name || "Unnamed Item") + '</h3>' +
+            '<p>' + (item.game || "Game") + ' • ' + (item.category || "Item") + '</p>' +
+          '</div>' +
+
+          '<strong>$' + price.toFixed(2) + '</strong>';
+
+        checkoutItems.appendChild(row);
+      });
+
+      checkoutTotal.textContent = "$" + total.toFixed(2);
+    }
+
+    async function saveOrderToFirebase(order) {
+      if (typeof addFirebaseOrder !== "function") {
+        alert("Firebase is not loaded. Check firebase.js.");
+        return null;
+      }
+
+      return await addFirebaseOrder(order);
+    }
+
+    checkoutForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+
+      const paymentMethod = document.getElementById("paymentMethod").value;
+
+      if (!paymentMethod) {
+        alert("Please select a payment method.");
+        return;
+      }
+
+      placeOrderBtn.disabled = true;
+      placeOrderBtn.textContent = "Saving Order...";
+
+      const order = {
+        robloxUsername: document.getElementById("robloxUsername").value.trim(),
+        contactInfo: document.getElementById("contactInfo").value.trim(),
+        deliveryNotes: document.getElementById("deliveryNotes").value.trim(),
+        paymentMethod: paymentMethod,
+        items: cart,
+        total: checkoutTotal.textContent,
+        status: "Pending"
+      };
+
+      try {
+        const savedOrder = await saveOrderToFirebase(order);
+
+        if (!savedOrder) {
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.textContent = "Place Order →";
+          return;
+        }
+
+        latestOrderId = savedOrder.id;
+        orderIdText.textContent = latestOrderId;
+        orderSuccess.classList.add("active");
+
+        if (paymentMethod === "Google Pay") {
+          const upiLink = makeUpiLink(latestOrderId);
+          const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+          if (isMobile) {
+            window.location.href = upiLink;
+          } else {
+            alert(
+              "Google Pay / UPI works only on mobile.\n\n" +
+              "Pay manually to this UPI ID:\n" +
+              UPI_ID +
+              "\n\nAmount: " +
+              checkoutTotal.textContent
+            );
+          }
+        }
+
+        localStorage.setItem("cart", "[]");
+        cart = [];
+
+        checkoutForm.reset();
+      } catch (error) {
+        console.error(error);
+        alert("Order could not be saved. Check Firebase rules or firebase.js.");
+
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.textContent = "Place Order →";
+      }
+    });
+
+    function copyOrderId() {
+      if (!latestOrderId) {
+        alert("No order ID found.");
+        return;
+      }
+
+      navigator.clipboard.writeText(latestOrderId);
+      alert("Order ID copied!");
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      renderCheckout();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Add Items - XyronVault</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="admin-page light-mode">
+
+  <main class="admin-wrap">
+    <div class="topbar">
+      <a class="logo nav-brand" href="index.html">
+        <img class="nav-logo-img" src="logo.png" alt="XyronVault logo">
+        <span>XyronVault</span>
+      </a>
+
+      <div class="topbar-actions">
+        <button class="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+        <a class="back-btn" href="index.html">View Homepage</a>
+      </div>
+    </div>
+
+    <div class="layout">
+      <section class="panel">
+        <h1>Add Product</h1>
+        <p class="hint">
+          Drag and drop a product image, add details, then save. It will appear on the homepage and game pages.
+        </p>
+
+        <div class="form-grid">
+          <label>
+            Product Name
+            <input id="itemName" placeholder="Example: Permanent Kitsune">
+          </label>
+
+          <label>
+            Game
+            <select id="itemGame" onchange="updateCategories(); updatePreview();">
+              <option value="Blox Fruits">Blox Fruits</option>
+              <option value="Steal a Brainrot">Steal a Brainrot</option>
+              <option value="Grow a Garden">Grow a Garden</option>
+              <option value="RIVALS">RIVALS</option>
+            </select>
+          </label>
+
+          <label>
+            Category
+            <select id="itemCategory" onchange="updatePreview()"></select>
+          </label>
+
+          <label>
+            Price
+            <input id="itemPrice" type="number" step="0.01" placeholder="Example: 9.99">
+          </label>
+
+          <label>
+            Stock
+            <input id="itemStock" type="number" placeholder="Example: 5">
+          </label>
+
+          <label>
+            Product Image
+            <div class="drop-zone" id="dropZone">
+              <div class="drop-content" id="dropContent">
+                <span class="upload-icon">🖼️</span>
+                <strong>Drag & drop image here</strong><br>
+                or click to choose from your device
+              </div>
+            </div>
+
+            <input id="imageInput" type="file" accept="image/*" hidden>
+
+            <div class="image-actions">
+              <button class="small-btn" type="button" onclick="openFilePicker()">Choose Image</button>
+              <button class="small-btn remove-img-btn" type="button" onclick="removeImage()">Remove</button>
+            </div>
+          </label>
+
+          <button class="save-btn" onclick="saveItem()">Save Product</button>
+        </div>
+
+        <div class="preview-card">
+          <div class="preview-img" id="previewImg">🎮</div>
+          <span class="tag" id="previewGame">Blox Fruits</span>
+          <h3 id="previewName">Product Name</h3>
+          <p class="meta" id="previewMeta">Category • Stock</p>
+          <p class="price" id="previewPrice">$0.00</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Saved Products</h2>
+        <p class="hint">
+          These products are saved in Firebase.
+        </p>
+
+        <div class="items-list" id="itemsList"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="theme.js"></script>
+  <script type="module" src="firebase.js"></script>
+
+  <script>
+    const categoriesByGame = {
+      "Blox Fruits": ["Gamepasses", "Perm Fruits", "Physical Fruits"],
+      "Steal a Brainrot": ["Brainrots"],
+      "Grow a Garden": ["Seeds", "Pets"],
+      "RIVALS": ["Gamepasses", "Skin Cases"]
+    };
+
+    let selectedImageData = "";
+
+    const itemName = document.getElementById("itemName");
+    const itemGame = document.getElementById("itemGame");
+    const itemCategory = document.getElementById("itemCategory");
+    const itemPrice = document.getElementById("itemPrice");
+    const itemStock = document.getElementById("itemStock");
+
+    const dropZone = document.getElementById("dropZone");
+    const dropContent = document.getElementById("dropContent");
+    const imageInput = document.getElementById("imageInput");
+
+    const previewImg = document.getElementById("previewImg");
+    const previewGame = document.getElementById("previewGame");
+    const previewName = document.getElementById("previewName");
+    const previewMeta = document.getElementById("previewMeta");
+    const previewPrice = document.getElementById("previewPrice");
+    const itemsList = document.getElementById("itemsList");
+
+    function updateCategories() {
+      const game = itemGame.value;
+      const categories = categoriesByGame[game] || [];
+
+      itemCategory.innerHTML = "";
+
+      categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        itemCategory.appendChild(option);
+      });
+    }
+
+    function openFilePicker() {
+      imageInput.click();
+    }
+
+    function removeImage() {
+      selectedImageData = "";
+      imageInput.value = "";
+
+      dropContent.innerHTML = `
+        <span class="upload-icon">🖼️</span>
+        <strong>Drag & drop image here</strong><br>
+        or click to choose from your device
+      `;
+
+      updatePreview();
+    }
+
+    function handleImageFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(event) {
+        compressImage(event.target.result, function(compressedImage) {
+          selectedImageData = compressedImage;
+
+          dropContent.innerHTML = `
+            <img src="${selectedImageData}" alt="Product image">
+          `;
+
+          updatePreview();
+        });
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function compressImage(dataUrl, callback) {
+      const img = new Image();
+
+      img.onload = function() {
+        const maxSize = 700;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > maxSize) {
+          height = Math.round((height * maxSize) / width);
+          width = maxSize;
+        } else if (height > width && height > maxSize) {
+          width = Math.round((width * maxSize) / height);
+          height = maxSize;
+        } else if (width === height && width > maxSize) {
+          width = maxSize;
+          height = maxSize;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedDataUrl = canvas.toDataURL("image/webp", 0.82);
+        callback(compressedDataUrl);
+      };
+
+      img.src = dataUrl;
+    }
+
+    function updatePreview() {
+      const name = itemName.value.trim() || "Product Name";
+      const game = itemGame.value;
+      const category = itemCategory.value || "Category";
+      const price = Number(itemPrice.value || 0);
+      const stock = Number(itemStock.value || 0);
+
+      previewGame.textContent = game;
+      previewName.textContent = name;
+      previewMeta.textContent = category + " • " + (stock > 0 ? "Stock: " + stock : "Stock: 0");
+      previewPrice.textContent = "$" + price.toFixed(2);
+
+      if (selectedImageData) {
+        previewImg.innerHTML = `<img src="${selectedImageData}" alt="${name}">`;
+      } else {
+        previewImg.innerHTML = "🎮";
+      }
+    }
+
+    async function saveItem() {
+      const name = itemName.value.trim();
+      const game = itemGame.value;
+      const category = itemCategory.value;
+      const price = Number(itemPrice.value);
+      const stock = Number(itemStock.value);
+
+      if (!name || !game || !category || isNaN(price) || isNaN(stock)) {
+        alert("Please fill product name, game, category, price, and stock.");
+        return;
+      }
+
+      if (typeof addFirebaseItem !== "function") {
+        alert("Firebase is not loaded. Check firebase.js.");
+        return;
+      }
+
+      await addFirebaseItem({
+        name,
+        game,
+        category,
+        price,
+        stock,
+        image: selectedImageData
+      });
+
+      itemName.value = "";
+      itemPrice.value = "";
+      itemStock.value = "";
+      removeImage();
+
+      updatePreview();
+      await renderSavedItems();
+
+      alert("Product saved to Firebase!");
+    }
+
+    async function renderSavedItems() {
+      itemsList.innerHTML = `
+        <div class="empty">
+          Loading products...
+        </div>
+      `;
+
+      if (typeof getFirebaseItems !== "function") {
+        itemsList.innerHTML = `
+          <div class="empty">
+            Firebase is not loaded ;-;<br>
+            Check firebase.js.
+          </div>
+        `;
+        return;
+      }
+
+      const items = await getFirebaseItems();
+
+      itemsList.innerHTML = "";
+
+      if (items.length === 0) {
+        itemsList.innerHTML = `
+          <div class="empty">
+            No products added yet ;-;<br>
+            Add your first product from the form.
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "saved-item";
+
+        const imageHTML = item.image
+          ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='🎮'">`
+          : "🎮";
+
+        card.innerHTML = `
+          <div class="saved-img">${imageHTML}</div>
+
+          <div>
+            <h3>${item.name}</h3>
+            <p>${item.game} • ${item.category}</p>
+            <p>$${Number(item.price).toFixed(2)} • Stock: ${item.stock}</p>
+          </div>
+
+          <button class="delete-btn" onclick="deleteItem('${item.id}')">Delete</button>
+        `;
+
+        itemsList.appendChild(card);
+      });
+    }
+
+    async function deleteItem(id) {
+      const confirmDelete = confirm("Delete this product?");
+      if (!confirmDelete) return;
+
+      if (typeof deleteFirebaseItem !== "function") {
+        alert("Firebase is not loaded. Check firebase.js.");
+        return;
+      }
+
+      await deleteFirebaseItem(id);
+      await renderSavedItems();
+    }
+
+    dropZone.addEventListener("click", openFilePicker);
+
+    imageInput.addEventListener("change", function() {
+      handleImageFile(imageInput.files[0]);
+    });
+
+    dropZone.addEventListener("dragover", function(event) {
+      event.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", function() {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", function(event) {
+      event.preventDefault();
+      dropZone.classList.remove("dragover");
+
+      const file = event.dataTransfer.files[0];
+      handleImageFile(file);
+    });
+
+    [itemName, itemPrice, itemStock].forEach(input => {
+      input.addEventListener("input", updatePreview);
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      updateCategories();
+      updatePreview();
+
+      setTimeout(async () => {
+        await renderSavedItems();
+      }, 500);
+    });
+  </script>
+
+</body>
+</html>

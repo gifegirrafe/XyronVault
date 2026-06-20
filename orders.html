@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>XyronVault Orders</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .orders-page {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 35px 25px 80px;
+    }
+
+    .orders-hero {
+      text-align: center;
+      padding: 45px 20px 35px;
+    }
+
+    .orders-hero h1 {
+      font-size: clamp(42px, 5vw, 76px);
+      font-weight: 1000;
+      color: var(--text);
+      letter-spacing: -2px;
+    }
+
+    .orders-hero h1 span {
+      color: var(--green);
+      text-shadow: 0 0 26px var(--shadow);
+    }
+
+    .orders-hero p {
+      color: var(--muted);
+      margin-top: 14px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .orders-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .orders-stat-card {
+      background:
+        radial-gradient(circle at top, rgba(0, 255, 153, 0.12), transparent 45%),
+        var(--panel);
+      border: 1.5px solid rgba(0, 255, 153, 0.22);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.14), 0 0 24px var(--shadow);
+    }
+
+    .orders-stat-card p {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .orders-stat-card h2 {
+      color: var(--green);
+      font-size: 32px;
+      font-weight: 1000;
+    }
+
+    .orders-panel {
+      background:
+        radial-gradient(circle at top, rgba(0, 255, 153, 0.08), transparent 45%),
+        var(--panel);
+      border: 1.5px solid rgba(0, 255, 153, 0.22);
+      border-radius: 30px;
+      padding: 26px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16), 0 0 28px var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .orders-tools {
+      display: grid;
+      grid-template-columns: 1fr 220px auto auto;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .orders-tools input,
+    .orders-tools select {
+      width: 100%;
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 14px 15px;
+      border-radius: 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .orders-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-weight: 1000;
+      background: var(--green);
+      color: #03120b;
+      white-space: nowrap;
+    }
+
+    .orders-danger-btn {
+      border: 1px solid rgba(255, 60, 100, 0.28);
+      border-radius: 14px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-weight: 1000;
+      background: rgba(255, 60, 100, 0.10);
+      color: #ff4d78;
+      white-space: nowrap;
+    }
+
+    .orders-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .order-card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      transition: 0.22s;
+    }
+
+    .order-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 255, 153, 0.35);
+      box-shadow: 0 0 26px var(--shadow);
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .order-id {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 1000;
+      margin-bottom: 6px;
+    }
+
+    .order-date {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .order-status {
+      min-width: 150px;
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid rgba(0, 255, 153, 0.25);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-weight: 900;
+      outline: none;
+    }
+
+    .order-info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .order-info-box {
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px;
+    }
+
+    .order-info-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .order-info-box strong {
+      color: var(--text);
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .order-items {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .order-item {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .order-item-img {
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      background: var(--image-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .order-item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px;
+    }
+
+    .order-item-img span {
+      font-size: 26px;
+    }
+
+    .order-item h4 {
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .order-item p {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .order-item-price {
+      color: var(--green);
+      font-weight: 1000;
+      font-size: 16px;
+    }
+
+    .order-notes {
+      margin-top: 14px;
+      background: rgba(0, 255, 153, 0.06);
+      border: 1px solid rgba(0, 255, 153, 0.16);
+      border-radius: 16px;
+      padding: 13px;
+      color: var(--muted-2);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .order-actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .small-order-btn {
+      border: 1px solid var(--line);
+      background: var(--panel-3);
+      color: var(--text);
+      padding: 10px 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 1000;
+    }
+
+    .small-order-btn:hover {
+      color: var(--green);
+      border-color: rgba(0, 255, 153, 0.38);
+    }
+
+    .empty-orders {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-orders h2 {
+      color: var(--text);
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    body.light-mode .orders-stat-card,
+    body.light-mode .orders-panel {
+      background:
+        radial-gradient(circle at top, rgba(0, 184, 117, 0.10), transparent 45%),
+        rgba(255, 255, 255, 0.82);
+    }
+
+    @media (max-width: 980px) {
+      .orders-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .orders-tools {
+        grid-template-columns: 1fr;
+      }
+
+      .order-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .orders-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .order-top {
+        flex-direction: column;
+      }
+
+      .order-status {
+        width: 100%;
+      }
+
+      .order-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-item {
+        grid-template-columns: 52px 1fr;
+      }
+
+      .order-item-price {
+        grid-column: 2;
+      }
+    }
+  </style>
+</head>
+
+<body class="admin-page light-mode">
+
+  <nav class="navbar">
+    <a class="logo nav-brand" href="index.html">
+      <img class="nav-logo-img" src="logo.png" alt="XyronVault logo">
+      <span>XyronVault</span>
+    </a>
+
+    <div class="nav-center">
+      <a href="index.html">Home</a>
+      <a href="add-items.html">Add Items</a>
+      <a href="orders.html">Orders</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+
+      <button class="cart-btn" onclick="window.location.href='index.html#shop'">
+        View Store
+      </button>
+    </div>
+  </nav>
+
+  <main class="orders-page">
+    <section class="orders-hero">
+      <div class="hero-trust-pill">
+        <span>📦 Admin Orders</span>
+      </div>
+
+      <h1>Manage <span>Orders</span></h1>
+      <p>View Firebase orders and update delivery status.</p>
+    </section>
+
+    <section class="orders-stats">
+      <div class="orders-stat-card">
+        <p>Total Orders</p>
+        <h2 id="totalOrders">0</h2>
+      </div>
+
+      <div class="orders-stat-card">
+        <p>Pending</p>
+        <h2 id="pendingOrders">0</h2>
+      </div>
+
+      <div class="orders-stat-card">
+        <p>Completed</p>
+        <h2 id="completedOrders">0</h2>
+      </div>
+
+      <div class="orders-stat-card">
+        <p>Total Revenue</p>
+        <h2 id="totalRevenue">$0</h2>
+      </div>
+    </section>
+
+    <section class="orders-panel">
+      <div class="orders-tools">
+        <input
+          type="text"
+          id="orderSearch"
+          placeholder="Search by order ID, username, contact, item..."
+          oninput="renderOrders()"
+        >
+
+        <select id="statusFilter" onchange="renderOrders()">
+          <option value="all">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Paid">Paid</option>
+          <option value="Delivering">Delivering</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+
+        <button class="orders-btn" onclick="exportOrders()">Export</button>
+
+        <button class="orders-danger-btn" onclick="clearAllOrders()">Clear All</button>
+      </div>
+
+      <div class="orders-list" id="ordersList">
+        <div class="empty-orders">
+          <h2>Loading orders...</h2>
+          <p>Please wait a moment.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    © 2026 XyronVault. All rights reserved.
+  </footer>
+
+  <script src="theme.js"></script>
+  <script type="module" src="firebase.js"></script>
+
+  <script>
+    let allOrders = [];
+
+    const totalOrders = document.getElementById("totalOrders");
+    const pendingOrders = document.getElementById("pendingOrders");
+    const completedOrders = document.getElementById("completedOrders");
+    const totalRevenue = document.getElementById("totalRevenue");
+
+    const orderSearch = document.getElementById("orderSearch");
+    const statusFilter = document.getElementById("statusFilter");
+    const ordersList = document.getElementById("ordersList");
+
+    function waitForFirebase(callback) {
+      let tries = 0;
+
+      const timer = setInterval(function() {
+        tries++;
+
+        if (typeof getFirebaseOrders === "function") {
+          clearInterval(timer);
+          callback();
+          return;
+        }
+
+        if (tries > 40) {
+          clearInterval(timer);
+          ordersList.innerHTML = `
+            <div class="empty-orders">
+              <h2>Firebase is not loaded ;-;</h2>
+              <p>Check that firebase.js is in the same folder as orders.html.</p>
+            </div>
+          `;
+        }
+      }, 100);
+    }
+
+    function moneyToNumber(value) {
+      return Number(String(value || "0").replace("$", "")) || 0;
+    }
+
+    function formatDate(value) {
+      if (!value) return "No date";
+
+      if (typeof value === "number") {
+        return new Date(value).toLocaleString();
+      }
+
+      return String(value);
+    }
+
+    async function loadOrders() {
+      if (typeof getFirebaseOrders !== "function") {
+        return [];
+      }
+
+      allOrders = await getFirebaseOrders();
+      renderOrders();
+    }
+
+    function renderStats(orders) {
+      const pending = orders.filter(order => order.status === "Pending").length;
+      const completed = orders.filter(order => order.status === "Completed").length;
+
+      const revenue = orders.reduce(function(sum, order) {
+        return sum + moneyToNumber(order.total);
+      }, 0);
+
+      totalOrders.textContent = orders.length;
+      pendingOrders.textContent = pending;
+      completedOrders.textContent = completed;
+      totalRevenue.textContent = "$" + revenue.toFixed(2);
+    }
+
+    function renderOrders() {
+      renderStats(allOrders);
+
+      const searchValue = orderSearch.value.toLowerCase().trim();
+      const selectedStatus = statusFilter.value;
+
+      let filteredOrders = [...allOrders];
+
+      if (selectedStatus !== "all") {
+        filteredOrders = filteredOrders.filter(function(order) {
+          return order.status === selectedStatus;
+        });
+      }
+
+      if (searchValue) {
+        filteredOrders = filteredOrders.filter(function(order) {
+          const itemsText = (order.items || [])
+            .map(function(item) {
+              return `${item.name} ${item.game} ${item.category}`;
+            })
+            .join(" ")
+            .toLowerCase();
+
+          return (
+            String(order.id || "").toLowerCase().includes(searchValue) ||
+            String(order.robloxUsername || "").toLowerCase().includes(searchValue) ||
+            String(order.contactInfo || "").toLowerCase().includes(searchValue) ||
+            String(order.paymentMethod || "").toLowerCase().includes(searchValue) ||
+            itemsText.includes(searchValue)
+          );
+        });
+      }
+
+      ordersList.innerHTML = "";
+
+      if (filteredOrders.length === 0) {
+        ordersList.innerHTML = `
+          <div class="empty-orders">
+            <h2>No orders found ;-;</h2>
+            <p>Orders from checkout will appear here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filteredOrders.forEach(function(order) {
+        const card = document.createElement("div");
+        card.className = "order-card";
+
+        const itemsHTML = (order.items || []).map(function(item) {
+          const price = Number(item.price || 0).toFixed(2);
+
+          return `
+            <div class="order-item">
+              <div class="order-item-img">
+                ${
+                  item.image
+                    ? `<img src="${item.image}" alt="${item.name}">`
+                    : `<span>🎮</span>`
+                }
+              </div>
+
+              <div>
+                <h4>${item.name || "Unnamed Item"}</h4>
+                <p>${item.game || "Game"} • ${item.category || "Item"}</p>
+              </div>
+
+              <div class="order-item-price">$${price}</div>
+            </div>
+          `;
+        }).join("");
+
+        card.innerHTML = `
+          <div class="order-top">
+            <div>
+              <div class="order-id">${order.id || "No ID"}</div>
+              <div class="order-date">${formatDate(order.createdAt)}</div>
+            </div>
+
+            <select class="order-status" data-order-id="${order.id}">
+              <option value="Pending" ${order.status === "Pending" ? "selected" : ""}>Pending</option>
+              <option value="Paid" ${order.status === "Paid" ? "selected" : ""}>Paid</option>
+              <option value="Delivering" ${order.status === "Delivering" ? "selected" : ""}>Delivering</option>
+              <option value="Completed" ${order.status === "Completed" ? "selected" : ""}>Completed</option>
+              <option value="Cancelled" ${order.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+            </select>
+          </div>
+
+          <div class="order-info-grid">
+            <div class="order-info-box">
+              <span>Roblox Username</span>
+              <strong>${order.robloxUsername || "Not given"}</strong>
+            </div>
+
+            <div class="order-info-box">
+              <span>Contact</span>
+              <strong>${order.contactInfo || "Not given"}</strong>
+            </div>
+
+            <div class="order-info-box">
+              <span>Payment Method</span>
+              <strong>${order.paymentMethod || "Not selected"}</strong>
+            </div>
+
+            <div class="order-info-box">
+              <span>Total</span>
+              <strong>${order.total || "$0.00"}</strong>
+            </div>
+          </div>
+
+          <div class="order-items">
+            ${itemsHTML}
+          </div>
+
+          ${
+            order.deliveryNotes
+              ? `<div class="order-notes"><b>Notes:</b> ${order.deliveryNotes}</div>`
+              : ""
+          }
+
+          <div class="order-actions">
+            <button class="small-order-btn copy-id-btn">Copy ID</button>
+            <button class="small-order-btn copy-user-btn">Copy Username</button>
+            <button class="small-order-btn copy-contact-btn">Copy Contact</button>
+            <button class="orders-danger-btn delete-order-btn">Delete</button>
+          </div>
+        `;
+
+        const statusSelect = card.querySelector(".order-status");
+
+        statusSelect.addEventListener("change", async function() {
+          await updateOrderStatus(order.id, statusSelect.value);
+        });
+
+        card.querySelector(".copy-id-btn").addEventListener("click", function() {
+          copyText(order.id || "");
+        });
+
+        card.querySelector(".copy-user-btn").addEventListener("click", function() {
+          copyText(order.robloxUsername || "");
+        });
+
+        card.querySelector(".copy-contact-btn").addEventListener("click", function() {
+          copyText(order.contactInfo || "");
+        });
+
+        card.querySelector(".delete-order-btn").addEventListener("click", async function() {
+          await deleteOrder(order.id);
+        });
+
+        ordersList.appendChild(card);
+      });
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      if (typeof updateFirebaseOrder !== "function") {
+        alert("Firebase is not loaded.");
+        return;
+      }
+
+      await updateFirebaseOrder(orderId, {
+        status: newStatus
+      });
+
+      await loadOrders();
+    }
+
+    async function deleteOrder(orderId) {
+      const confirmDelete = confirm("Delete this order?");
+
+      if (!confirmDelete) return;
+
+      if (typeof deleteFirebaseOrder !== "function") {
+        alert("Firebase is not loaded.");
+        return;
+      }
+
+      await deleteFirebaseOrder(orderId);
+      await loadOrders();
+    }
+
+    async function clearAllOrders() {
+      const confirmClear = confirm("Delete ALL orders? This cannot be undone.");
+
+      if (!confirmClear) return;
+
+      if (typeof deleteFirebaseOrder !== "function") {
+        alert("Firebase is not loaded.");
+        return;
+      }
+
+      for (const order of allOrders) {
+        await deleteFirebaseOrder(order.id);
+      }
+
+      await loadOrders();
+    }
+
+    function copyText(text) {
+      if (!text) {
+        alert("Nothing to copy.");
+        return;
+      }
+
+      navigator.clipboard.writeText(text);
+      alert("Copied!");
+    }
+
+    function exportOrders() {
+      if (allOrders.length === 0) {
+        alert("No orders to export.");
+        return;
+      }
+
+      const data = JSON.stringify(allOrders, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "xyronvault-orders.json";
+      link.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      waitForFirebase(async function() {
+        await loadOrders();
+      });
+    });
+  </script>
+
+</body>
+</html>
