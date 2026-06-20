@@ -6,6 +6,7 @@
 
   <title>Add Items - XyronVault</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -27,8 +28,13 @@
     <div class="layout">
       <section class="panel">
         <h1>Add Product</h1>
+
         <p class="hint">
-          Drag and drop a product image, add details, then save. It will appear on the homepage and game pages.
+          Add product details, choose an image, then save. It will appear on the homepage and game pages.
+        </p>
+
+        <p class="hint" id="firebaseStatus">
+          Checking Firebase...
         </p>
 
         <div class="form-grid">
@@ -80,7 +86,9 @@
             </div>
           </label>
 
-          <button class="save-btn" onclick="saveItem()">Save Product</button>
+          <button class="save-btn" id="saveBtn" type="button" onclick="saveItem()">
+            Save Product
+          </button>
         </div>
 
         <div class="preview-card">
@@ -94,11 +102,18 @@
 
       <section class="panel">
         <h2>Saved Products</h2>
+
         <p class="hint">
           These products are saved in Firebase.
         </p>
 
         <div class="items-list" id="itemsList"></div>
+
+        <div class="danger-row">
+          <button class="clear-all-btn" type="button" onclick="clearAllItems()">
+            Clear All Products
+          </button>
+        </div>
       </section>
     </div>
   </main>
@@ -115,6 +130,8 @@
     };
 
     let selectedImageData = "";
+    let firebaseReady = false;
+    let savedItemsCache = [];
 
     const itemName = document.getElementById("itemName");
     const itemGame = document.getElementById("itemGame");
@@ -131,7 +148,49 @@
     const previewName = document.getElementById("previewName");
     const previewMeta = document.getElementById("previewMeta");
     const previewPrice = document.getElementById("previewPrice");
+
     const itemsList = document.getElementById("itemsList");
+    const saveBtn = document.getElementById("saveBtn");
+    const firebaseStatus = document.getElementById("firebaseStatus");
+
+    function waitForFirebase(callback) {
+      let tries = 0;
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Loading Firebase...";
+
+      const timer = setInterval(function() {
+        tries++;
+
+        if (typeof addFirebaseItem === "function" && typeof getFirebaseItems === "function") {
+          clearInterval(timer);
+
+          firebaseReady = true;
+          firebaseStatus.textContent = "Firebase connected ✅";
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save Product";
+
+          callback();
+          return;
+        }
+
+        if (tries > 60) {
+          clearInterval(timer);
+
+          firebaseReady = false;
+          firebaseStatus.textContent = "Firebase not loaded ;-; Check firebase.js and use Live Server.";
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save Product";
+
+          itemsList.innerHTML = `
+            <div class="empty">
+              Firebase is not loaded ;-;<br>
+              Make sure firebase.js is in the same folder and open with Live Server.
+            </div>
+          `;
+        }
+      }, 100);
+    }
 
     function updateCategories() {
       const game = itemGame.value;
@@ -139,7 +198,7 @@
 
       itemCategory.innerHTML = "";
 
-      categories.forEach(category => {
+      categories.forEach(function(category) {
         const option = document.createElement("option");
         option.value = category;
         option.textContent = category;
@@ -170,6 +229,12 @@
         return;
       }
 
+      dropContent.innerHTML = `
+        <span class="upload-icon">⏳</span>
+        <strong>Compressing image...</strong><br>
+        please wait
+      `;
+
       const reader = new FileReader();
 
       reader.onload = function(event) {
@@ -184,6 +249,11 @@
         });
       };
 
+      reader.onerror = function() {
+        alert("Image could not be read. Try another image.");
+        removeImage();
+      };
+
       reader.readAsDataURL(file);
     }
 
@@ -191,7 +261,7 @@
       const img = new Image();
 
       img.onload = function() {
-        const maxSize = 700;
+        const maxSize = 260;
         let width = img.width;
         let height = img.height;
 
@@ -213,8 +283,16 @@
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        const compressedDataUrl = canvas.toDataURL("image/webp", 0.82);
+        const compressedDataUrl = canvas.toDataURL("image/webp", 0.35);
+
+        console.log("Compressed image size:", Math.round(compressedDataUrl.length / 1024) + " KB");
+
         callback(compressedDataUrl);
+      };
+
+      img.onerror = function() {
+        alert("Image could not be loaded. Try another image.");
+        removeImage();
       };
 
       img.src = dataUrl;
@@ -251,29 +329,41 @@
         return;
       }
 
-      if (typeof addFirebaseItem !== "function") {
-        alert("Firebase is not loaded. Check firebase.js.");
+      if (!firebaseReady || typeof addFirebaseItem !== "function") {
+        alert("Firebase is not ready. Wait a second or check firebase.js.");
         return;
       }
 
-      await addFirebaseItem({
-        name,
-        game,
-        category,
-        price,
-        stock,
-        image: selectedImageData
-      });
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
 
-      itemName.value = "";
-      itemPrice.value = "";
-      itemStock.value = "";
-      removeImage();
+      try {
+        await addFirebaseItem({
+          name: name,
+          game: game,
+          category: category,
+          price: price,
+          stock: stock,
+          image: selectedImageData || ""
+        });
 
-      updatePreview();
-      await renderSavedItems();
+        itemName.value = "";
+        itemPrice.value = "";
+        itemStock.value = "";
+        removeImage();
 
-      alert("Product saved to Firebase!");
+        updateCategories();
+        updatePreview();
+        await renderSavedItems();
+
+        alert("Product saved to Firebase!");
+      } catch (error) {
+        console.error("Save product error:", error);
+        alert("Product did not save. Open Inspect → Console and check the red Firebase error.");
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save Product";
     }
 
     async function renderSavedItems() {
@@ -283,65 +373,107 @@
         </div>
       `;
 
-      if (typeof getFirebaseItems !== "function") {
+      if (!firebaseReady || typeof getFirebaseItems !== "function") {
         itemsList.innerHTML = `
           <div class="empty">
-            Firebase is not loaded ;-;<br>
-            Check firebase.js.
+            Firebase is not ready yet ;-;
           </div>
         `;
         return;
       }
 
-      const items = await getFirebaseItems();
+      try {
+        const items = await getFirebaseItems();
+        savedItemsCache = items;
 
-      itemsList.innerHTML = "";
+        itemsList.innerHTML = "";
 
-      if (items.length === 0) {
+        if (items.length === 0) {
+          itemsList.innerHTML = `
+            <div class="empty">
+              No products added yet ;-;<br>
+              Add your first product from the form.
+            </div>
+          `;
+          return;
+        }
+
+        items.forEach(function(item) {
+          const card = document.createElement("div");
+          card.className = "saved-item";
+
+          const imageHTML = item.image
+            ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='🎮'">`
+            : "🎮";
+
+          card.innerHTML = `
+            <div class="saved-img">${imageHTML}</div>
+
+            <div>
+              <h3>${item.name || "Unnamed Product"}</h3>
+              <p>${item.game || "Game"} • ${item.category || "Category"}</p>
+              <p>$${Number(item.price || 0).toFixed(2)} • Stock: ${item.stock || 0}</p>
+            </div>
+
+            <button class="delete-btn" type="button">Delete</button>
+          `;
+
+          card.querySelector(".delete-btn").addEventListener("click", async function() {
+            await deleteItem(item.id);
+          });
+
+          itemsList.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Load products error:", error);
+
         itemsList.innerHTML = `
           <div class="empty">
-            No products added yet ;-;<br>
-            Add your first product from the form.
+            Products could not load ;-;<br>
+            Check Firebase rules or Console errors.
           </div>
         `;
-        return;
       }
-
-      items.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "saved-item";
-
-        const imageHTML = item.image
-          ? `<img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='🎮'">`
-          : "🎮";
-
-        card.innerHTML = `
-          <div class="saved-img">${imageHTML}</div>
-
-          <div>
-            <h3>${item.name}</h3>
-            <p>${item.game} • ${item.category}</p>
-            <p>$${Number(item.price).toFixed(2)} • Stock: ${item.stock}</p>
-          </div>
-
-          <button class="delete-btn" onclick="deleteItem('${item.id}')">Delete</button>
-        `;
-
-        itemsList.appendChild(card);
-      });
     }
 
     async function deleteItem(id) {
       const confirmDelete = confirm("Delete this product?");
       if (!confirmDelete) return;
 
-      if (typeof deleteFirebaseItem !== "function") {
-        alert("Firebase is not loaded. Check firebase.js.");
+      if (!firebaseReady || typeof deleteFirebaseItem !== "function") {
+        alert("Firebase is not ready.");
         return;
       }
 
-      await deleteFirebaseItem(id);
-      await renderSavedItems();
+      try {
+        await deleteFirebaseItem(id);
+        await renderSavedItems();
+      } catch (error) {
+        console.error("Delete product error:", error);
+        alert("Product could not be deleted. Check Console.");
+      }
+    }
+
+    async function clearAllItems() {
+      const confirmClear = confirm("Delete ALL products? This cannot be undone.");
+      if (!confirmClear) return;
+
+      if (!firebaseReady || typeof deleteFirebaseItem !== "function") {
+        alert("Firebase is not ready.");
+        return;
+      }
+
+      try {
+        for (const item of savedItemsCache) {
+          await deleteFirebaseItem(item.id);
+        }
+
+        await renderSavedItems();
+        alert("All products deleted.");
+      } catch (error) {
+        console.error("Clear products error:", error);
+        alert("Products could not be cleared. Check Console.");
+      }
     }
 
     dropZone.addEventListener("click", openFilePicker);
@@ -367,17 +499,17 @@
       handleImageFile(file);
     });
 
-    [itemName, itemPrice, itemStock].forEach(input => {
+    [itemName, itemPrice, itemStock].forEach(function(input) {
       input.addEventListener("input", updatePreview);
     });
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    document.addEventListener("DOMContentLoaded", function() {
       updateCategories();
       updatePreview();
 
-      setTimeout(async () => {
+      waitForFirebase(async function() {
         await renderSavedItems();
-      }, 500);
+      });
     });
   </script>
 
