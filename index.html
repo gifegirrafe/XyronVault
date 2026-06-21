@@ -221,7 +221,12 @@
         <p>Every order comes with perks made for players.</p>
       </div>
 
-      <div class="zyron-benefits-grid">
+      <div class="benefits-carousel-head">
+        <button class="benefits-arrow" type="button" onclick="scrollBenefits(-1)">‹</button>
+        <button class="benefits-arrow" type="button" onclick="scrollBenefits(1)">›</button>
+      </div>
+
+      <div class="zyron-benefits-grid" id="benefitsCarousel">
         <div class="zyron-benefit-card">
           <div class="zyron-card-icon">🚀</div>
           <h3>Instant Support</h3>
@@ -487,6 +492,17 @@
       if (!stepsCarousel) return;
 
       stepsCarousel.scrollBy({
+        left: direction * 330,
+        behavior: "smooth"
+      });
+    }
+
+    function scrollBenefits(direction) {
+      const benefitsCarousel = document.getElementById("benefitsCarousel");
+
+      if (!benefitsCarousel) return;
+
+      benefitsCarousel.scrollBy({
         left: direction * 330,
         behavior: "smooth"
       });
