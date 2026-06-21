@@ -667,11 +667,13 @@
     }
 
     function openCart() {
-      cartDrawer.classList.add("active");
+     cartDrawer.classList.add("active");
+     document.body.classList.add("cart-open");
     }
 
-    function closeCart() {
+     function closeCart() {
       cartDrawer.classList.remove("active");
+      document.body.classList.remove("cart-open");
     }
 
     function checkout() {
