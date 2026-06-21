@@ -9235,3 +9235,101 @@ body:not(.light-mode) .shop-panel {
     }
   }
 }
+/* MOBILE WHY SHOP CAROUSEL */
+
+.benefits-carousel-head {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .zyron-benefits-section {
+    position: relative !important;
+    padding-top: 28px !important;
+  }
+
+  .zyron-benefits-section .zyron-section-title {
+    margin-bottom: 20px !important;
+  }
+
+  .benefits-carousel-head {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 0 22px !important;
+    margin: -8px 0 12px !important;
+  }
+
+  .benefits-arrow {
+    width: 44px !important;
+    height: 44px !important;
+    border: none !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 34px !important;
+    font-weight: 1000 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.16),
+      0 4px 10px rgba(0, 0, 0, 0.08) !important;
+    animation: benefitsArrowNudge 1.1s ease-in-out infinite !important;
+  }
+
+  .zyron-benefits-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 18px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth !important;
+    scroll-snap-type: x mandatory !important;
+
+    padding: 4px 22px 20px !important;
+    scrollbar-width: none !important;
+  }
+
+  .zyron-benefits-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .zyron-benefits-grid .zyron-benefit-card {
+    flex: 0 0 86% !important;
+    max-width: 86% !important;
+    min-height: 245px !important;
+    scroll-snap-align: center !important;
+
+    padding: 28px 22px !important;
+    border-radius: 30px !important;
+  }
+
+  .zyron-benefits-grid .zyron-card-icon {
+    width: 82px !important;
+    height: 82px !important;
+    font-size: 32px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .zyron-benefits-grid .zyron-benefit-card h3 {
+    font-size: 27px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .zyron-benefits-grid .zyron-benefit-card p {
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+  }
+
+  @keyframes benefitsArrowNudge {
+    0%, 100% {
+      transform: translateX(0);
+    }
+
+    50% {
+      transform: translateX(5px);
+    }
+  }
+}
