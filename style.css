@@ -10019,3 +10019,104 @@ body {
     border-radius: 15px !important;
   }
 }
+/* FIX MOBILE PRODUCT CARDS BEING WEIRD / CUT OFF */
+
+@media (max-width: 768px) {
+  .items-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 0 12px !important;
+    overflow: visible !important;
+  }
+
+  .items-grid > .item-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    overflow: hidden !important;
+
+    padding: 12px !important;
+    border-radius: 22px !important;
+  }
+
+  .items-grid > .item-card .item-img-wrap {
+    width: 100% !important;
+    height: 145px !important;
+    border-radius: 18px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .items-grid > .item-card h3 {
+    font-size: 18px !important;
+    line-height: 1.05 !important;
+    margin: 0 0 6px !important;
+  }
+
+  .items-grid > .item-card .item-meta {
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .items-grid > .item-card .item-bottom {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .items-grid > .item-card .price {
+    font-size: 21px !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+
+  .items-grid > .item-card .add-btn {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 40px !important;
+
+    padding: 0 !important;
+    font-size: 12px !important;
+    border-radius: 14px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* tiny phones */
+@media (max-width: 360px) {
+  .items-grid {
+    gap: 10px !important;
+    padding: 0 8px !important;
+  }
+
+  .items-grid > .item-card {
+    padding: 10px !important;
+  }
+
+  .items-grid > .item-card .item-img-wrap {
+    height: 125px !important;
+  }
+
+  .items-grid > .item-card .price {
+    font-size: 18px !important;
+  }
+
+  .items-grid > .item-card .add-btn {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+    font-size: 11px !important;
+  }
+}
