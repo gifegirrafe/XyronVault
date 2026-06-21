@@ -180,7 +180,12 @@
         <p>Simple, fast, and easy from start to finish.</p>
       </div>
 
-      <div class="zyron-steps-grid">
+      <div class="steps-carousel-head">
+        <button class="steps-arrow" type="button" onclick="scrollSteps(-1)">‹</button>
+        <button class="steps-arrow" type="button" onclick="scrollSteps(1)">›</button>
+      </div>
+
+      <div class="zyron-steps-grid" id="stepsCarousel">
         <div class="zyron-info-card">
           <div class="zyron-card-icon">🎮</div>
           <h3>Choose Your Game</h3>
@@ -394,12 +399,13 @@
           return;
         }
 
-        if (tries > 40) {
+        if (tries > 80) {
           clearInterval(timer);
+
           itemsGrid.innerHTML = `
             <div class="empty-state">
               <h3>Firebase is not loaded ;-;</h3>
-              <p>Check that firebase.js is in the same folder as index.html.</p>
+              <p>Check firebase.js, Firestore rules, and use Live Server.</p>
             </div>
           `;
         }
@@ -411,13 +417,26 @@
         return [];
       }
 
-      return await getFirebaseItems();
+      try {
+        return await getFirebaseItems();
+      } catch (error) {
+        console.error("Load products error:", error);
+
+        itemsGrid.innerHTML = `
+          <div class="empty-state">
+            <h3>Products could not load ;-;</h3>
+            <p>Check Firebase rules or Console errors.</p>
+          </div>
+        `;
+
+        return [];
+      }
     }
 
     function renderGameMenu() {
       gameMenu.innerHTML = "";
 
-      games.forEach(game => {
+      games.forEach(function(game) {
         const item = document.createElement("div");
         item.className = "game-menu-item";
 
@@ -462,10 +481,21 @@
       gamePopup.classList.remove("active");
     }
 
+    function scrollSteps(direction) {
+      const stepsCarousel = document.getElementById("stepsCarousel");
+
+      if (!stepsCarousel) return;
+
+      stepsCarousel.scrollBy({
+        left: direction * 330,
+        behavior: "smooth"
+      });
+    }
+
     function renderGameFilterChips() {
       gameFilterChips.innerHTML = "";
 
-      filterGames.forEach(game => {
+      filterGames.forEach(function(game) {
         const button = document.createElement("button");
         button.className = "game-filter-chip";
         button.innerHTML = `<span>${game.icon}</span> ${game.label}`;
@@ -492,7 +522,7 @@
       }
 
       renderGameFilterChips();
-      renderHomepageItems();
+      await renderHomepageItems();
     }
 
     async function renderHomepageItems() {
@@ -503,7 +533,9 @@
       let filteredItems = [...allProducts];
 
       if (selectedGame !== "all") {
-        filteredItems = filteredItems.filter(item => item.game === selectedGame);
+        filteredItems = filteredItems.filter(function(item) {
+          return item.game === selectedGame;
+        });
       }
 
       renderCards(filteredItems, itemsGrid);
@@ -522,7 +554,7 @@
         return;
       }
 
-      items.forEach(item => {
+      items.forEach(function(item) {
         const card = document.createElement("div");
         card.className = "item-card";
 
@@ -560,7 +592,9 @@
     }
 
     function addToCart(id) {
-      const item = allProducts.find(product => String(product.id) === String(id));
+      const item = allProducts.find(function(product) {
+        return String(product.id) === String(id);
+      });
 
       if (!item) {
         alert("Item not found.");
@@ -592,7 +626,7 @@
         cartItems.innerHTML = `<p style="color:var(--muted);">Your cart is empty.</p>`;
       }
 
-      cart.forEach((item, index) => {
+      cart.forEach(function(item, index) {
         const price = Number(item.price || 0);
         total += price;
 
