@@ -10145,3 +10145,41 @@ body {
     height: 145px !important;
   }
 }
+/* MOBILE PRODUCT CARD SIZE ONLY */
+
+@media (max-width: 768px) {
+  .items-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding: 0 10px !important;
+  }
+
+  .items-grid > .item-card {
+    width: 100% !important;
+    min-height: 310px !important;
+    padding: 10px !important;
+  }
+
+  .items-grid > .item-card .item-img-wrap {
+    height: 150px !important;
+  }
+
+  .items-grid > .item-card h3 {
+    font-size: 15px !important;
+  }
+
+  .items-grid > .item-card .item-meta {
+    font-size: 12px !important;
+  }
+
+  .items-grid > .item-card .price {
+    font-size: 21px !important;
+  }
+
+  .items-grid > .item-card .add-btn {
+    width: 54px !important;
+    min-width: 54px !important;
+    height: 40px !important;
+    font-size: 12px !important;
+  }
+}
