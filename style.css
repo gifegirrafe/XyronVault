@@ -9333,3 +9333,25 @@ body:not(.light-mode) .shop-panel {
     }
   }
 }
+/* MOBILE CART OPEN - HIDE NAVBAR */
+
+@media (max-width: 768px) {
+  body.cart-open {
+    overflow: hidden !important;
+  }
+
+  body.cart-open .navbar {
+    display: none !important;
+  }
+
+  .cart-drawer.active {
+    z-index: 999999 !important;
+  }
+
+  body.cart-open .cart-drawer {
+    top: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding-top: 22px !important;
+  }
+}
