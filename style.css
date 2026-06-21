@@ -9497,3 +9497,293 @@ body:not(.light-mode) .shop-panel {
     font-size: 11.5px !important;
   }
 }
+/* CLEAN CART DRAWER - PC + MOBILE */
+
+body.cart-open {
+  overflow: hidden !important;
+}
+
+body.cart-open .navbar {
+  display: none !important;
+}
+
+body.cart-open::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.18) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 99990 !important;
+}
+
+.cart-drawer {
+  z-index: 99999 !important;
+}
+
+/* PC cart look */
+@media (min-width: 769px) {
+  .cart-drawer {
+    position: fixed !important;
+    top: 28px !important;
+    right: 28px !important;
+
+    width: 430px !important;
+    max-width: calc(100vw - 56px) !important;
+    height: calc(100dvh - 56px) !important;
+    max-height: calc(100dvh - 56px) !important;
+
+    border-radius: 30px !important;
+    padding: 24px !important;
+
+    background: #ffffff !important;
+    border: 1px solid rgba(17, 24, 39, 0.10) !important;
+
+    box-shadow:
+      0 35px 90px rgba(0, 0, 0, 0.25),
+      0 12px 28px rgba(0, 0, 0, 0.12) !important;
+
+    overflow-y: auto !important;
+  }
+
+  .cart-drawer.active {
+    transform: translateX(0) !important;
+  }
+}
+
+/* mobile cart look */
+@media (max-width: 768px) {
+  .cart-drawer {
+    top: 0 !important;
+    right: 0 !important;
+
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    border-radius: 0 !important;
+    padding: 22px !important;
+
+    overflow-y: auto !important;
+  }
+}
+/* FIX CART SHOWING WHEN CLOSED */
+
+.cart-drawer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+
+  transform: translateX(120%) !important;
+  transition:
+    transform 0.35s ease,
+    opacity 0.25s ease,
+    visibility 0.25s ease !important;
+
+  z-index: -1 !important;
+}
+
+.cart-drawer.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+
+  transform: translateX(0) !important;
+  z-index: 99999 !important;
+}
+
+/* overlay only when cart is open */
+body::before {
+  display: none !important;
+}
+
+body.cart-open::before {
+  display: block !important;
+}
+
+/* navbar only hides when cart is actually open */
+body:not(.cart-open) .navbar {
+  display: flex !important;
+}
+/* FINAL CART FIX - SCROLL WORKS + NAV ONLY HIDES ON PHONE */
+
+/* cart hidden when closed */
+.cart-drawer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(120%) !important;
+  z-index: -1 !important;
+}
+
+/* cart visible when open */
+.cart-drawer.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateX(0) !important;
+  z-index: 999999 !important;
+}
+
+/* remove forced page lock */
+body.cart-open {
+  overflow: auto !important;
+}
+
+/* no overlay unless cart is open */
+body::before {
+  display: none !important;
+}
+
+/* PC: keep navbar visible, but cart stays above it */
+@media (min-width: 769px) {
+  body.cart-open .navbar {
+    display: flex !important;
+  }
+
+  .cart-drawer.active {
+    position: fixed !important;
+    top: 24px !important;
+    right: 24px !important;
+
+    width: 430px !important;
+    max-width: calc(100vw - 48px) !important;
+    height: calc(100dvh - 48px) !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    border-radius: 30px !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+
+    box-shadow:
+      0 35px 90px rgba(0, 0, 0, 0.25),
+      0 12px 28px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+/* PHONE: hide navbar, but cart itself can scroll */
+@media (max-width: 768px) {
+  body.cart-open {
+    overflow: hidden !important;
+  }
+
+  body.cart-open .navbar {
+    display: none !important;
+  }
+
+  .cart-drawer.active {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+
+    border-radius: 0 !important;
+    padding: 22px 22px 90px !important;
+    background: #ffffff !important;
+  }
+}
+/* RESTORE MOBILE NAVBAR LAYOUT AFTER CART FIX */
+
+@media (max-width: 768px) {
+  body:not(.cart-open) .navbar,
+  body.light-mode:not(.cart-open) .navbar,
+  body:not(.light-mode):not(.cart-open) .navbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 148px !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    margin: 8px !important;
+    padding: 10px !important;
+  }
+
+  body:not(.cart-open) .navbar .nav-brand,
+  body:not(.cart-open) .navbar .logo {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 !important;
+  }
+
+  body:not(.cart-open) .navbar .nav-actions {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+  }
+
+  body:not(.cart-open) .navbar .nav-center {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+
+  body.cart-open .navbar {
+    display: none !important;
+  }
+}
+
+/* PC navbar stays normal */
+@media (min-width: 769px) {
+  body:not(.cart-open) .navbar,
+  body.cart-open .navbar {
+    display: flex !important;
+  }
+}
+/* REMOVE ANNOYING LEFT-RIGHT PAGE SCROLL */
+
+html,
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+* {
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden !important;
+  }
+
+  .navbar,
+  .container,
+  main,
+  section,
+  .shop-panel,
+  .hero,
+  .marketplace-hero,
+  .zyron-steps-section,
+  .zyron-benefits-section,
+  .footer {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .navbar {
+    left: 0 !important;
+    right: auto !important;
+  }
+
+  .cart-drawer,
+  .game-popup-bg,
+  .game-popup {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  img {
+    max-width: 100% !important;
+  }
+}
