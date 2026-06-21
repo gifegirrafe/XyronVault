@@ -9924,3 +9924,66 @@ body {
     font-size: 12px !important;
   }
 }
+/* FIX CHECKOUT MOBILE NAV BUTTON TEXT */
+
+@media (max-width: 768px) {
+  body:has(.checkout-page) .navbar {
+    grid-template-columns: minmax(0, 1fr) 220px !important;
+  }
+
+  body:has(.checkout-page) .navbar .nav-actions {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    gap: 7px !important;
+  }
+
+  body:has(.checkout-page) .navbar .theme-toggle {
+    width: 78px !important;
+    min-width: 78px !important;
+    max-width: 78px !important;
+    font-size: 13px !important;
+  }
+
+  body:has(.checkout-page) .navbar .cart-btn {
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
+
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+
+  body:has(.checkout-page) .navbar .nav-brand span,
+  body:has(.checkout-page) .navbar .logo span {
+    max-width: 78px !important;
+  }
+}
+
+/* tiny phones */
+@media (max-width: 360px) {
+  body:has(.checkout-page) .navbar {
+    grid-template-columns: minmax(0, 1fr) 198px !important;
+  }
+
+  body:has(.checkout-page) .navbar .nav-actions {
+    width: 198px !important;
+    min-width: 198px !important;
+    max-width: 198px !important;
+  }
+
+  body:has(.checkout-page) .navbar .theme-toggle {
+    width: 70px !important;
+    min-width: 70px !important;
+    max-width: 70px !important;
+    font-size: 12px !important;
+  }
+
+  body:has(.checkout-page) .navbar .cart-btn {
+    width: 122px !important;
+    min-width: 122px !important;
+    max-width: 122px !important;
+    font-size: 12px !important;
+  }
+}
