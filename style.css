@@ -9987,3 +9987,35 @@ body {
     font-size: 12px !important;
   }
 }
+/* MAKE CHECKOUT BACK BUTTON SMALLER */
+
+@media (max-width: 768px) {
+  body:has(.checkout-page) .navbar {
+    grid-template-columns: minmax(0, 1fr) 150px !important;
+  }
+
+  body:has(.checkout-page) .navbar .nav-actions {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+    gap: 6px !important;
+  }
+
+  body:has(.checkout-page) .navbar .theme-toggle {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    height: 42px !important;
+    font-size: 12px !important;
+  }
+
+  body:has(.checkout-page) .navbar .cart-btn {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    font-size: 13px !important;
+    border-radius: 15px !important;
+  }
+}
