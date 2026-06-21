@@ -9787,3 +9787,140 @@ body {
     max-width: 100% !important;
   }
 }
+/* FIX ORDERS PAGE MOBILE LAYOUT */
+
+@media (max-width: 768px) {
+  .orders-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 14px 60px !important;
+    overflow-x: hidden !important;
+  }
+
+  .orders-hero {
+    padding: 28px 8px 24px !important;
+  }
+
+  .orders-hero h1 {
+    font-size: 42px !important;
+    line-height: 1.05 !important;
+    letter-spacing: -1px !important;
+  }
+
+  .orders-hero p {
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+  }
+
+  .orders-stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin: 0 0 18px !important;
+  }
+
+  .orders-stat-card {
+    width: 100% !important;
+    min-height: 118px !important;
+    padding: 16px !important;
+    border-radius: 22px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.10),
+      0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .orders-stat-card p {
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .orders-stat-card h2 {
+    font-size: 31px !important;
+    line-height: 1 !important;
+  }
+
+  .orders-panel {
+    width: 100% !important;
+    padding: 16px !important;
+    border-radius: 24px !important;
+  }
+
+  .orders-tools {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .orders-tools input,
+  .orders-tools select {
+    height: 48px !important;
+    font-size: 13px !important;
+    border-radius: 14px !important;
+  }
+
+  .orders-btn,
+  .orders-danger-btn {
+    height: 46px !important;
+    padding: 0 14px !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+  }
+
+  .order-card {
+    padding: 15px !important;
+    border-radius: 22px !important;
+  }
+
+  .order-info-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .order-info-box {
+    padding: 11px !important;
+    border-radius: 14px !important;
+  }
+
+  .order-item {
+    grid-template-columns: 48px 1fr !important;
+    gap: 10px !important;
+  }
+
+  .order-item-img {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+  }
+
+  .order-item-price {
+    grid-column: 2 !important;
+    font-size: 15px !important;
+  }
+}
+
+/* tiny phones */
+@media (max-width: 360px) {
+  .orders-stats {
+    gap: 10px !important;
+  }
+
+  .orders-stat-card {
+    min-height: 105px !important;
+    padding: 13px !important;
+  }
+
+  .orders-stat-card h2 {
+    font-size: 27px !important;
+  }
+
+  .orders-stat-card p {
+    font-size: 12px !important;
+  }
+}
