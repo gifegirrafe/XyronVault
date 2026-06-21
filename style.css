@@ -9137,3 +9137,101 @@ body:not(.light-mode) .shop-panel {
     font-size: 18px !important;
   }
 }
+/* MOBILE HOW IT WORKS CAROUSEL */
+
+.steps-carousel-head {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .zyron-steps-section {
+    position: relative !important;
+    padding-top: 30px !important;
+  }
+
+  .zyron-steps-section .zyron-section-title {
+    margin-bottom: 20px !important;
+  }
+
+  .steps-carousel-head {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    padding: 0 22px !important;
+    margin: -8px 0 12px !important;
+  }
+
+  .steps-arrow {
+    width: 44px !important;
+    height: 44px !important;
+    border: none !important;
+    border-radius: 16px !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 34px !important;
+    font-weight: 1000 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow:
+      0 12px 28px rgba(0, 0, 0, 0.16),
+      0 4px 10px rgba(0, 0, 0, 0.08) !important;
+    animation: stepsArrowNudge 1.1s ease-in-out infinite !important;
+  }
+
+  .zyron-steps-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 18px !important;
+
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth !important;
+    scroll-snap-type: x mandatory !important;
+
+    padding: 4px 22px 20px !important;
+    scrollbar-width: none !important;
+  }
+
+  .zyron-steps-grid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .zyron-steps-grid .zyron-info-card {
+    flex: 0 0 86% !important;
+    max-width: 86% !important;
+    min-height: 260px !important;
+    scroll-snap-align: center !important;
+
+    padding: 28px 22px !important;
+    border-radius: 30px !important;
+  }
+
+  .zyron-steps-grid .zyron-card-icon {
+    width: 82px !important;
+    height: 82px !important;
+    font-size: 32px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .zyron-steps-grid .zyron-info-card h3 {
+    font-size: 27px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .zyron-steps-grid .zyron-info-card p {
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+  }
+
+  @keyframes stepsArrowNudge {
+    0%, 100% {
+      transform: translateX(0);
+    }
+
+    50% {
+      transform: translateX(5px);
+    }
+  }
+}
